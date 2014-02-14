@@ -1,7 +1,9 @@
 package baseObjects;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javafx.scene.canvas.GraphicsContext;
 import Controller.Updater;
 
 public class Body {
@@ -16,7 +18,6 @@ public class Body {
 		this.velocity = newVelocity;
 		this.acceleration = newAcceleration;
 		this.netForce = new Vector(0,0);
-		log.info(this.coordinates.toString());
 		
 	}
 	
@@ -44,6 +45,10 @@ public class Body {
 		return coordinates;
 	}
 
+	public void draw(GraphicsContext gc) {
+//		log.info(this+"|"+this.coordinates.toString());
+		gc.fillOval(coordinates.getX()-5, coordinates.getY()-5, 10, 10);
+	}
 
 	private double mass;
 	private Vector velocity = new Vector(0, 0);
@@ -51,5 +56,8 @@ public class Body {
 	private Coordinates coordinates;
 	private Vector netForce = new Vector(0, 0);
 	
-	Logger log = Logger.getAnonymousLogger();
+	private static Logger log = Logger.getAnonymousLogger();
+	static {
+		log.setLevel(Level.ALL);
+	}
 }

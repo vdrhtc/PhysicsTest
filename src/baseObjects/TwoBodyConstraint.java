@@ -1,6 +1,10 @@
 package baseObjects;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 
 public class TwoBodyConstraint extends Body {
@@ -29,7 +33,8 @@ public class TwoBodyConstraint extends Body {
 	}
 	
 	private double calculateLengthDelta() {
-		return new Vector(startBody.getCoordinates(), endBody.getCoordinates()).mod()-undeformedLenght;
+		currentLengthDelta = new Vector(startBody.getCoordinates(), endBody.getCoordinates()).mod()-undeformedLenght;
+		return currentLengthDelta;
 	}
 	
 	private Vector getDirectiveVector() {
@@ -65,12 +70,26 @@ public class TwoBodyConstraint extends Body {
 		this.undeformedLenght = undeformedLenght;
 	}
 
+	@Override
+	public void draw(GraphicsContext gc) {
+		
+		if(calculateLengthDelta()>0)
+			gc.setStroke(Color.GREEN);
+		else
+			gc.setStroke(Color.RED);
+		
+		gc.strokeLine(startBody.getCoordinates().getX(), startBody.getCoordinates().getY(),
+				endBody.getCoordinates().getX(), endBody.getCoordinates().getY());
+	}
 	private double stiffness;
 	private double undeformedLenght;
+	private double currentLengthDelta;
 	
 	private Body startBody;
 	private Body endBody;
 	
-	Logger log = Logger.getAnonymousLogger();
-
+	private static Logger log = Logger.getAnonymousLogger();
+	static {
+		log.setLevel(Level.ALL);
+	}
 }
