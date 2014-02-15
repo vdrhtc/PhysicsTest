@@ -62,11 +62,11 @@ public class Launcher extends Application {
 	private ArrayList<Body> createBodies() {
 		ArrayList<Body> bodies = new ArrayList<>();
 		TwoBodyConstraint spring1 = new TwoBodyConstraint(0, new Coordinates(0, 0), 10000, 110);
-		TwoBodyConstraint spring2 = new TwoBodyConstraint(0, new Coordinates(0, 0), 10, 50);
+		TwoBodyConstraint spring2 = new TwoBodyConstraint(0, new Coordinates(0, 0), 1, 50);
 		TwoBodyConstraint spring3 = new TwoBodyConstraint(0, new Coordinates(0, 0), 50, 50);
 		Body matDot_start = new RoughBody(1, new Coordinates(500, 350), 0.1);
 		Body matDot_end = new RoughBody(1, new Coordinates(610, 350), 0.1);
-		Body matDot_anotherEnd = new RoughBody(1, new Coordinates(210, 200), 1000);
+		Body matDot_anotherEnd = new RoughBody(1, new Coordinates(210, 200), 0.1);
 		spring1.setStartBody(matDot_start);
 		spring1.setEndBody(matDot_end);
 		spring2.setStartBody(matDot_end);

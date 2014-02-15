@@ -27,7 +27,9 @@ public class Vector {
 	}
 	
 	public Vector div(double factor) {
-		return this.mul(1./factor);
+		double x = this.x/factor;
+		double y = this.y/factor;
+		return new Vector(x, y);
 	}
 	
 	public Vector mul(double factor) {

@@ -31,7 +31,7 @@ public class ViewUpdater {
 
 					@Override
 					public void handle(ActionEvent event) {
-						elapsedTime+=drawPeriod.toSeconds();
+						elapsedTime += drawPeriod.toSeconds();
 						draw();
 					}
 				}));
@@ -58,16 +58,18 @@ public class ViewUpdater {
 	}
 
 	private void drawInterface(SystemState s) {
-		
-		double currTotal=SystemStateComputer.calculateEnergy(s);
+
+		double currTotal = SystemStateComputer.calculateEnergy(s);
 		gc.strokeText(
 				"Updates/s: "
 						+ String.format(Locale.US, "%.2e",
 								SystemStateComputer.getRealUpdateFrequency())
 						+ ", Total energy: "
-						+ String.format(Locale.US, "%.2f", currTotal)+", Elapsed time: "+String.format(Locale.US, "%.2f", elapsedTime), 200, 100);
-		
-		
+						+ String.format(Locale.US, "%.2f", currTotal)
+						+ ", Elapsed time: "
+						+ String.format(Locale.US, "%.2f", elapsedTime), 200,
+				100);
+
 	}
 
 	public GraphicsContext gc;
