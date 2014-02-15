@@ -1,4 +1,5 @@
-package baseObjects;
+package calculation;
+
 
 public class Vector {
 
@@ -8,8 +9,8 @@ public class Vector {
 	}
 	
 	public Vector(double x, double y) {
-		this.setX(x);
-		this.setY(y);
+		this.x = x;
+		this.y = y;
 	}
 	
 	public Vector() {}
@@ -25,36 +26,36 @@ public class Vector {
 		return new Coordinates(x, y);
 	}
 	
-	public Vector divide(double factor) {
-		return this.multiply(1./factor);
+	public Vector div(double factor) {
+		return this.mul(1./factor);
 	}
 	
-	public Vector multiply(double factor) {
+	public Vector mul(double factor) {
 		double x = this.x*factor;
 		double y = this.y*factor;
 		return new Vector(x, y);
 	}
 	
-	public double mod() {
+	public Double mod() {
 		return Math.sqrt(x*x+y*y);
 	}
 	public Vector neg() {
 		return new Vector(-this.x, -this.y);
 	}
+	public Vector norm() {
+		double mod = mod();
+		if(mod!=0)
+			return new Vector(x, y).div(mod());
+		else
+			return new Vector(0, 0);
+	}
 	
 	public double getX() {
 		return x;
 	}
-	public void setX(double x) {
-		this.x = x;
-	}
 
 	public double getY() {
 		return y;
-	}
-
-	public void setY(double y) {
-		this.y = y;
 	}
 
 	public String toString() {

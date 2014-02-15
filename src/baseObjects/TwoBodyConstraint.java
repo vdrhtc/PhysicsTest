@@ -3,21 +3,30 @@ package baseObjects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import calculation.Coordinates;
+import calculation.Vector;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 
 public class TwoBodyConstraint extends Body {
 
+	public TwoBodyConstraint(double mass, Coordinates c, double stiffness, double undeformedLength, double currentLengthDelta) {
+		super(mass, c);
+		this.stiffness = stiffness;
+		this.undeformedLength = undeformedLength;
+		this.currentLengthDelta = currentLengthDelta;
+	}
 	public TwoBodyConstraint(double mass, Coordinates c, double stiffness, double undeformedLength) {
 		super(mass, c);
-		this.setStiffness(stiffness);
-		this.setUndeformedLenght(undeformedLength);
+		this.stiffness = stiffness;
+		this.undeformedLength = undeformedLength;
 	}
-	
 	@Override
 	public void update() {
 		broadcastAppliedForce();
+		if(log.isLoggable(Level.INFO))
+			log.info(this.endBody.getVelocity().toString());
 	}
 
 	
@@ -29,19 +38,24 @@ public class TwoBodyConstraint extends Body {
 	
 	
 	private Vector calculateAppliedForce() {
-		return getDirectiveVector().multiply(stiffness*calculateLengthDelta());
+		return getDirectiveVector().mul(stiffness*calculateLengthDelta());
 	}
 	
 	private double calculateLengthDelta() {
-		currentLengthDelta = new Vector(startBody.getCoordinates(), endBody.getCoordinates()).mod()-undeformedLenght;
+		currentLengthDelta = new Vector(startBody.getCoordinates(), endBody.getCoordinates()).mod()-undeformedLength;
 		return currentLengthDelta;
 	}
 	
+	
 	private Vector getDirectiveVector() {
 		Vector vec = new Vector(startBody.getCoordinates(), endBody.getCoordinates());
-		return vec.divide(vec.mod());
+		return vec.div(vec.mod());
 	}
 	
+	
+	public double getEnergy() {
+		return Math.pow(this.currentLengthDelta, 2)*this.stiffness/2;
+	}
 	
 	public Body getStartBody() {
 		return startBody;
@@ -62,13 +76,6 @@ public class TwoBodyConstraint extends Body {
 	public double getStiffness() {
 		return stiffness;
 	}
-	public void setStiffness(double stiffness) {
-		this.stiffness = stiffness;
-	}
-	
-	private void setUndeformedLenght(double undeformedLenght) {
-		this.undeformedLenght = undeformedLenght;
-	}
 
 	@Override
 	public void draw(GraphicsContext gc) {
@@ -81,8 +88,16 @@ public class TwoBodyConstraint extends Body {
 		gc.strokeLine(startBody.getCoordinates().getX(), startBody.getCoordinates().getY(),
 				endBody.getCoordinates().getX(), endBody.getCoordinates().getY());
 	}
+	
+	@Override
+	public TwoBodyConstraint clone() {
+		TwoBodyConstraint copy = new TwoBodyConstraint(getMass(), getCoordinates(), stiffness, undeformedLength, currentLengthDelta);
+		copy.setStartBody(startBody.clone());
+		copy.setEndBody(endBody.clone());
+		return copy;
+	}
 	private double stiffness;
-	private double undeformedLenght;
+	private double undeformedLength;
 	private double currentLengthDelta;
 	
 	private Body startBody;
@@ -90,6 +105,6 @@ public class TwoBodyConstraint extends Body {
 	
 	private static Logger log = Logger.getAnonymousLogger();
 	static {
-		log.setLevel(Level.ALL);
+		log.setLevel(Level.OFF);
 	}
 }

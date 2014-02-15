@@ -1,9 +1,10 @@
-package baseObjects;
+package calculation;
+
 
 public class Coordinates {
 	public Coordinates(double x, double y) {
-		this.setX(x);
-		this.setY(y);
+		this.x = x;
+		this.y =y;
 	}
 	
 	
@@ -21,9 +22,6 @@ public class Coordinates {
 	public double getX() {
 		return x;
 	}
-	public void setX(double x2) {
-		this.x = x2;
-	}
 
 
 
@@ -33,14 +31,11 @@ public class Coordinates {
 
 
 
-	public void setY(double y2) {
-		this.y = y2;
-	}
-
 	@Override
 	public String toString(){
 		return "X = "+x+", Y = "+y;
 	}
+	
 
 	private double x;
 	private double y;
