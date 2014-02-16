@@ -51,33 +51,79 @@ public class Launcher extends Application {
 		primaryStage.setScene(scene);
 		primaryStage.show();
 		
-		SSC = new SystemStateComputer(new SystemState(bodies));
-		VU = new ViewUpdater(canvas.getGraphicsContext2D());
+		SystemState s = new SystemState(bodies);
+		SSC = new SystemStateComputer(s);
+		ViewUpdater.setGraphicsContext(canvas.getGraphicsContext2D());
 		
 		SSC.launch();
-		VU.launchDraw();
+		
+		ViewUpdater.forceDraw(s);
+		ViewUpdater.launchDraw();
 		
 	}
 
 	private ArrayList<Body> createBodies() {
 		ArrayList<Body> bodies = new ArrayList<>();
-		TwoBodyConstraint spring1 = new TwoBodyConstraint(0, new Coordinates(0, 0), 10000, 110);
-		TwoBodyConstraint spring2 = new TwoBodyConstraint(0, new Coordinates(0, 0), 1, 50);
-		TwoBodyConstraint spring3 = new TwoBodyConstraint(0, new Coordinates(0, 0), 50, 50);
-		Body matDot_start = new RoughBody(1, new Coordinates(500, 350), 0.1);
-		Body matDot_end = new RoughBody(1, new Coordinates(610, 350), 0.1);
-		Body matDot_anotherEnd = new RoughBody(1, new Coordinates(210, 200), 0.1);
+/*Чек*/	TwoBodyConstraint spring1 = new TwoBodyConstraint(0, new Coordinates(0, 0), 10, 210);
+		TwoBodyConstraint spring2 = new TwoBodyConstraint(0, new Coordinates(0, 0), 10000, 90);
+		TwoBodyConstraint spring3 = new TwoBodyConstraint(0, new Coordinates(0, 0), 50, 110);
+		TwoBodyConstraint spring4 = new TwoBodyConstraint(0, new Coordinates(0, 0), 50, 100);
+		TwoBodyConstraint spring5 = new TwoBodyConstraint(0, new Coordinates(0, 0), 50, 100);
+		Body matDot_start = new RoughBody(100, new Coordinates(400, 350), 1);
+		Body matDot_end = new RoughBody(1, new Coordinates(610, 300), 100);
+		Body matDot_anotherEnd = new RoughBody(1, new Coordinates(700, 300), 100);
+		Body matDot_yetAnotherEnd = new RoughBody(100, new Coordinates(800, 450), 1);
+		Body matDot_yetAnotherEnd2 = new RoughBody(100, new Coordinates(900, 450), 1);
+		Body matDot_yetAnotherEnd3 = new RoughBody(1, new Coordinates(950, 250), 1);
 		spring1.setStartBody(matDot_start);
 		spring1.setEndBody(matDot_end);
 		spring2.setStartBody(matDot_end);
 		spring2.setEndBody(matDot_anotherEnd);
 		spring3.setStartBody(matDot_anotherEnd);
-		spring3.setEndBody(matDot_start);
+		spring3.setEndBody(matDot_yetAnotherEnd);
+		spring4.setStartBody(matDot_anotherEnd);
+		spring4.setEndBody(matDot_yetAnotherEnd2);
+		spring5.setStartBody(matDot_anotherEnd);
+		spring5.setEndBody(matDot_yetAnotherEnd3);
+		
+		Body matDot_tStart = new RoughBody(0.1, new Coordinates(900, 400), 1);
+		Body matDot_tUp = new RoughBody(0.1, new Coordinates(950, 350), 1);
+		Body matDot_tEnd = new RoughBody(0.1, new Coordinates(1000, 400), 1);
+
+		TwoBodyConstraint springT1  = new TwoBodyConstraint(0, new Coordinates(0, 0), 10000, 70.7107);
+		TwoBodyConstraint springT2 = new TwoBodyConstraint(0, new Coordinates(0, 0), 10000, 70.7107);
+		TwoBodyConstraint springT3 = new TwoBodyConstraint(0, new Coordinates(0, 0), 10000, 100);
+		TwoBodyConstraint connector = new TwoBodyConstraint(0, new Coordinates(0, 0), 10, 100);
+
+		
+		springT1.setStartBody(matDot_tStart);
+		springT1.setEndBody(matDot_tUp);		
+		springT2.setStartBody(matDot_tUp);
+		springT2.setEndBody(matDot_tEnd);		
+		springT3.setStartBody(matDot_tStart);
+		springT3.setEndBody(matDot_tEnd);	
+
+		connector.setEndBody(matDot_tStart);
+		connector.setStartBody(matDot_yetAnotherEnd3);
+		
 		bodies.add(spring1);
 		bodies.add(spring2);
+		bodies.add(spring3);
+		bodies.add(spring4);
+		bodies.add(spring5);
+		bodies.add(springT1);
+		bodies.add(springT2);
+		bodies.add(springT3);
 		bodies.add(matDot_end);
 		bodies.add(matDot_start);
 		bodies.add(matDot_anotherEnd);
+		bodies.add(matDot_yetAnotherEnd);
+		bodies.add(matDot_yetAnotherEnd2);
+		bodies.add(matDot_yetAnotherEnd3);
+		bodies.add(matDot_tStart);
+		bodies.add(matDot_tUp);
+		bodies.add(matDot_tEnd);
+		bodies.add(connector);
 		
 		return bodies;
 	}
@@ -89,6 +135,5 @@ public class Launcher extends Application {
 
 	private Canvas canvas;
 	private SystemStateComputer SSC;
-	private ViewUpdater VU;
 
 }

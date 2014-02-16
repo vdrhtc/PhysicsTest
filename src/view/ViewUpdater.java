@@ -19,11 +19,13 @@ public class ViewUpdater {
 	public static Duration drawPeriod = Duration.millis(10);
 	public static Duration interfaceUpdatePeriod = Duration.millis(500);
 
-	public ViewUpdater(GraphicsContext gc) {
-		this.gc = gc;
+	
+	public static void setGraphicsContext(GraphicsContext gc) {
+		ViewUpdater.gc = gc;
+
 	}
 
-	public void launchDraw() {
+	public static void launchDraw() {
 
 		Timeline tD = new Timeline();
 		tD.getKeyFrames().add(
@@ -40,24 +42,29 @@ public class ViewUpdater {
 		tD.play();
 	}
 
-	private void draw() {
-		gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas()
-				.getHeight());
+	private static void draw() {
 		SystemState s = SystemStateConveyor.getNextSystemState();
 		if (s != null) {
+			gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas()
+					.getHeight());
 			drawInterface(s);
 			drawBodies(s);
 		}
 	}
+	
+	public static void forceDraw(SystemState s) {
+		drawInterface(s);
+		drawBodies(s);
+	}
 
-	private void drawBodies(SystemState s) {
+	private static void drawBodies(SystemState s) {
 
 		for (Body b : s.getBodies()) {
 			b.draw(gc);
 		}
 	}
 
-	private void drawInterface(SystemState s) {
+	private static void drawInterface(SystemState s) {
 
 		double currTotal = SystemStateComputer.calculateEnergy(s);
 		gc.strokeText(
@@ -72,6 +79,6 @@ public class ViewUpdater {
 
 	}
 
-	public GraphicsContext gc;
-	public double elapsedTime;
+	public static GraphicsContext gc;
+	public static double elapsedTime;
 }

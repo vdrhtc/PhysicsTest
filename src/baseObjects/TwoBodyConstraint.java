@@ -55,9 +55,10 @@ public class TwoBodyConstraint extends Body {
 		currentLengthDelta = new Vector(startBody.getCoordinates(),
 				endBody.getCoordinates()).mod()
 				- undeformedLength;
-		if (maxLengthDelta < currentLengthDelta) {
+		if (Math.abs(maxLengthDelta) < Math.abs(currentLengthDelta)) {
 			maxLengthDelta = currentLengthDelta;
-		}
+		} else if(Math.abs(currentLengthDelta)<1) 
+			maxLengthDelta = currentLengthDelta;
 		return currentLengthDelta;
 	}
 
@@ -106,10 +107,8 @@ public class TwoBodyConstraint extends Body {
 
 		gc.strokeLine(xs, ys, xe, ye);
 //		log.info(maxLengthDelta+"");
-		if (maxLengthDelta < currentLengthDelta) {
-			maxLengthDelta = currentLengthDelta;
-		}
-		gc.strokeText(String.format(Locale.US, "%.2f", maxLengthDelta),
+		
+		gc.strokeText(String.format(Locale.US, "%.1f", maxLengthDelta)+"\n"+String.format(Locale.US, "%.0f", stiffness),
 				(xs + xe) / 2, (ys + ye) / 2);
 	}
 
