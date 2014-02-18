@@ -34,7 +34,7 @@ public class SystemStateConveyor {
 	private static int cyclesToSkip;
 	private static int skippedCycles;
 	private static ArrayBlockingQueue<SystemState> states = new ArrayBlockingQueue<>(
-			2);
+			10);
 	private static Logger log = Logger.getAnonymousLogger();
 
 	static {

@@ -3,7 +3,6 @@ package view;
 import java.util.Locale;
 
 import communication.SystemStateConveyor;
-
 import calculation.SystemState;
 import calculation.SystemStateComputer;
 import baseObjects.Body;
@@ -12,6 +11,7 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 public class ViewUpdater {
@@ -66,13 +66,19 @@ public class ViewUpdater {
 
 	private static void drawInterface(SystemState s) {
 
-		double currTotal = SystemStateComputer.calculateEnergy(s);
+		gc.setStroke(Color.BLACK);
+
+		
+		double currTotal = s.calculateEnergy();
+		
 		gc.strokeText(
 				"Updates/s: "
 						+ String.format(Locale.US, "%.2e",
 								SystemStateComputer.getRealUpdateFrequency())
 						+ ", Total energy: "
 						+ String.format(Locale.US, "%.2f", currTotal)
+						+ ", Energy delta per second: "
+						+ String.format(Locale.US, "%.2f", SystemStateComputer.getEnergyDeltaPerSecond())
 						+ ", Elapsed time: "
 						+ String.format(Locale.US, "%.2f", elapsedTime), 200,
 				100);

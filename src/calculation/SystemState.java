@@ -14,6 +14,16 @@ public class SystemState {
 		return bodies;
 	}
 	
+
+	public double calculateEnergy() {
+		double currTotal=0; 
+		for(Body b : getBodies()) {
+			currTotal+=b.getEnergy();
+		}
+		
+		return currTotal;
+	}
+	
 	public SystemState clone() {
 		ArrayList<Body> copyBodies = new ArrayList<>();
 		for (Body b : bodies) {

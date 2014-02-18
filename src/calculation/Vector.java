@@ -38,12 +38,20 @@ public class Vector {
 		return new Vector(x, y);
 	}
 	
+	public static double calculateDistance(Coordinates start, Coordinates end) {
+		return Math.sqrt((start.getX() - end.getX())
+				* (start.getX() - end.getX())
+						+ (start.getY() - end.getY())
+								* (start.getY() - end.getY()));
+	}
+	
 	public Double mod() {
 		return Math.sqrt(x*x+y*y);
 	}
 	public Vector neg() {
 		return new Vector(-this.x, -this.y);
 	}
+	
 	public Vector norm() {
 		double mod = mod();
 		if(mod!=0)

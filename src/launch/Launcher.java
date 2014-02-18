@@ -17,7 +17,7 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import baseObjects.Body;
 import baseObjects.RoughBody;
-import baseObjects.TwoBodyConstraint;
+import baseObjects.Spring;
 
 
 public class Launcher extends Application {
@@ -55,7 +55,7 @@ public class Launcher extends Application {
 		SSC = new SystemStateComputer(s);
 		ViewUpdater.setGraphicsContext(canvas.getGraphicsContext2D());
 		
-		SSC.launch();
+		SSC.launchMonitors();
 		
 		ViewUpdater.forceDraw(s);
 		ViewUpdater.launchDraw();
@@ -64,47 +64,29 @@ public class Launcher extends Application {
 
 	private ArrayList<Body> createBodies() {
 		ArrayList<Body> bodies = new ArrayList<>();
-/*Чек*/	TwoBodyConstraint spring1 = new TwoBodyConstraint(0, new Coordinates(0, 0), 10, 210);
-		TwoBodyConstraint spring2 = new TwoBodyConstraint(0, new Coordinates(0, 0), 10000, 90);
-		TwoBodyConstraint spring3 = new TwoBodyConstraint(0, new Coordinates(0, 0), 50, 110);
-		TwoBodyConstraint spring4 = new TwoBodyConstraint(0, new Coordinates(0, 0), 50, 100);
-		TwoBodyConstraint spring5 = new TwoBodyConstraint(0, new Coordinates(0, 0), 50, 100);
-		Body matDot_start = new RoughBody(100, new Coordinates(400, 350), 1);
-		Body matDot_end = new RoughBody(1, new Coordinates(610, 300), 100);
-		Body matDot_anotherEnd = new RoughBody(1, new Coordinates(700, 300), 100);
-		Body matDot_yetAnotherEnd = new RoughBody(100, new Coordinates(800, 450), 1);
-		Body matDot_yetAnotherEnd2 = new RoughBody(100, new Coordinates(900, 450), 1);
-		Body matDot_yetAnotherEnd3 = new RoughBody(1, new Coordinates(950, 250), 1);
-		spring1.setStartBody(matDot_start);
-		spring1.setEndBody(matDot_end);
-		spring2.setStartBody(matDot_end);
-		spring2.setEndBody(matDot_anotherEnd);
-		spring3.setStartBody(matDot_anotherEnd);
-		spring3.setEndBody(matDot_yetAnotherEnd);
-		spring4.setStartBody(matDot_anotherEnd);
-		spring4.setEndBody(matDot_yetAnotherEnd2);
-		spring5.setStartBody(matDot_anotherEnd);
-		spring5.setEndBody(matDot_yetAnotherEnd3);
+		Body matDot_start = new RoughBody(1, new Coordinates(300, 500), 0);
+		Body matDot_end = new RoughBody(1, new Coordinates(320, 550), 0);
+		Body matDot_anotherEnd = new RoughBody(1, new Coordinates(450, 600), 0);
+		Body matDot_yetAnotherEnd = new RoughBody(100, new Coordinates(480, 650), 0);
+		Body matDot_yetAnotherEnd2 = new RoughBody(100, new Coordinates(480, 700), 0);
+		Body matDot_yetAnotherEnd3 = new RoughBody(1, new Coordinates(450, 750), 0);
 		
-		Body matDot_tStart = new RoughBody(0.1, new Coordinates(900, 400), 1);
-		Body matDot_tUp = new RoughBody(0.1, new Coordinates(950, 350), 1);
-		Body matDot_tEnd = new RoughBody(0.1, new Coordinates(1000, 400), 1);
-
-		TwoBodyConstraint springT1  = new TwoBodyConstraint(0, new Coordinates(0, 0), 10000, 70.7107);
-		TwoBodyConstraint springT2 = new TwoBodyConstraint(0, new Coordinates(0, 0), 10000, 70.7107);
-		TwoBodyConstraint springT3 = new TwoBodyConstraint(0, new Coordinates(0, 0), 10000, 100);
-		TwoBodyConstraint connector = new TwoBodyConstraint(0, new Coordinates(0, 0), 10, 100);
-
+		/*Чек*/	Spring spring1 = new Spring(100, 110, matDot_start, matDot_end);
+		Spring spring2 = new Spring(1000, 90, matDot_end, matDot_anotherEnd);
+		Spring spring3 = new Spring(50, 110, matDot_anotherEnd, matDot_yetAnotherEnd);
+		Spring spring4 = new Spring(50, 100, matDot_anotherEnd, matDot_yetAnotherEnd2);
+		Spring spring5 = new Spring(50, 100, matDot_anotherEnd, matDot_yetAnotherEnd3);
 		
-		springT1.setStartBody(matDot_tStart);
-		springT1.setEndBody(matDot_tUp);		
-		springT2.setStartBody(matDot_tUp);
-		springT2.setEndBody(matDot_tEnd);		
-		springT3.setStartBody(matDot_tStart);
-		springT3.setEndBody(matDot_tEnd);	
+		Body matDot_tStart = new RoughBody(0.1, new Coordinates(400, 780), 0);
+		Body matDot_tUp = new RoughBody(0.1, new Coordinates(350, 780), 0);
+		Body matDot_tEnd = new RoughBody(0.1, new Coordinates(320, 750), 0);
+		Body matDot_tYetAnotherEnd = new RoughBody(0.1, new Coordinates(300, 700), 0);
 
-		connector.setEndBody(matDot_tStart);
-		connector.setStartBody(matDot_yetAnotherEnd3);
+		Spring springT1  = new Spring(10, 70.7107, matDot_tStart, matDot_tUp);
+		Spring springT2 = new Spring(10, 70.7107, matDot_tUp, matDot_tEnd);
+		Spring springT3 = new Spring(10, 100, matDot_tStart, matDot_tEnd);
+		Spring connector = new Spring(10, 100, matDot_tStart, matDot_yetAnotherEnd3);
+
 		
 		bodies.add(spring1);
 		bodies.add(spring2);

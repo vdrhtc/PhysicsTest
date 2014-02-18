@@ -8,10 +8,9 @@ import calculation.Coordinates;
 import calculation.SystemStateComputer;
 import calculation.Vector;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 public class Body {
-
-	public final double velocityLimit = 1000;
 
 	public Body(double mass, Coordinates coordinates) {
 		this.mass = mass;
@@ -45,15 +44,12 @@ public class Body {
 		Vector delta = newAcceleration.add(acceleration).mul(
 				SystemStateComputer.bodyIntegrationGrain / 2);
 		Vector newVelocity = velocity.add(delta);
-		double newMod = newVelocity.mod();
 		return newVelocity;
-//		if (newMod <= velocityLimit)
-//		else
-//			return velocity;
 	}
 
 	public double getEnergy() {
-		return this.mass*Math.pow(this.velocity.mod(), 2)/2;
+		double velocityMod = this.velocity.mod();
+		return this.mass*velocityMod*velocityMod/2;
 	}
 	
 	private Vector calculateNewCoordinates(Vector newVelocity) {
@@ -76,7 +72,8 @@ public class Body {
 	}
 
 	public void draw(GraphicsContext gc) {
-//		log.info(this+"|"+this.velocity.toString());
+		gc.setStroke(Color.BLACK);
+
 		gc.fillOval(coordinates.getX() - 5, coordinates.getY() - 5, 10, 10);
 		gc.strokeText(
 				String.format(Locale.US, "%.3f", velocity.mod()) + "px/s",
