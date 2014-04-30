@@ -11,7 +11,7 @@ import calculation.Vector;
 
 public class Spring extends Body {
 
-	public Spring(double stiffness, double undeformedLength,
+	protected Spring(double stiffness, double undeformedLength,
 			double currentLengthDelta, double maxLengthDelta, Body startBody, Body endBody) {
 		super(0, new RadiusVector(0, 0));
 		this.stiffness = stiffness;
@@ -64,12 +64,13 @@ public class Spring extends Body {
 		if (Math.abs(maxLengthDelta) < Math.abs(currentLengthDelta))
 			maxLengthDelta = currentLengthDelta;
 	}
-	private Vector calculateAppliedForce() {
+	
+	protected Vector calculateAppliedForce() {
 		return getDirectiveVector().mul(stiffness * currentLengthDelta);
 	}
 
 
-	private Vector getDirectiveVector() {
+	public Vector getDirectiveVector() {
 		Vector vec = new Vector(startBody.getRadiusVector(),
 				endBody.getRadiusVector());
 		return vec.div(currentLength);
@@ -121,6 +122,18 @@ public class Spring extends Body {
 		Spring copy = new Spring(stiffness, undeformedLength,
 				currentLengthDelta, maxLengthDelta, startBody.clone(), endBody.clone());
 		return copy;
+	}
+	
+	public double getCurrentLengthDelta() {
+		return currentLengthDelta;
+	}
+	
+	public double getUndeformedLength() {
+		return undeformedLength;
+	}
+	
+	public double getMaxLengthDelta() {
+		return maxLengthDelta;
 	}
 	
 //	private final double period;

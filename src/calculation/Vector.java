@@ -22,6 +22,9 @@ public class Vector {
 	
 	}
 	
+	public static double dotProduct(Vector a, Vector b) {
+		return a.getX()*b.getX()+a.getX()*b.getX();
+	}
 	
 	public Vector div(double factor) {
 		double x = this.x/factor;

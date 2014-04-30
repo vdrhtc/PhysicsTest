@@ -20,6 +20,7 @@ public class RoughBody extends Body {
 	@Override
 	public void update() {
 		Vector friction = getVelocity().norm().mul(-frictionFactor);
+		
 		this.applyForce(friction);
 		super.update();
 	}

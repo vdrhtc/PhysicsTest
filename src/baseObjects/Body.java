@@ -14,13 +14,13 @@ public class Body {
 
 	public Body(double mass, RadiusVector coordinates) {
 		this.mass = mass;
-		this.coordinates = coordinates;
+		this.coordinates = this.previousCoordinates = coordinates;
 	}
 
 	public Body(double mass, RadiusVector coordinates, Vector velocity,
 			Vector acceleration, Vector netForce) {
 		this.mass = mass;
-		this.coordinates = coordinates;
+		this.coordinates = this.previousCoordinates = coordinates;
 		this.velocity = velocity;
 		this.acceleration = acceleration;
 	}
@@ -28,11 +28,24 @@ public class Body {
 	public void update() {
 		Vector newAcceleration = calculateNewAcceleration();
 		Vector newVelocity = calculateVelocity(newAcceleration);
+		RadiusVector previousCoordinates = this.coordinates;
+
 		this.coordinates = calculateNewRadiusVector(newVelocity);
+//		this.coordinates = calculateNewRadiusVectorVerlet();
 		this.velocity = newVelocity;
+		this.previousCoordinates = previousCoordinates;
 		this.acceleration = newAcceleration;
 		this.netForce = new Vector(0, 0);
 
+	}
+
+	private RadiusVector calculateNewRadiusVectorVerlet() {
+		return this.coordinates
+				.mul(2)
+				.add(this.previousCoordinates.neg())
+				.add(this.acceleration
+						.mul(SystemStateComputer.bodyIntegrationGrain
+								* SystemStateComputer.bodyIntegrationGrain));
 	}
 
 	private Vector calculateNewAcceleration() {
@@ -49,9 +62,9 @@ public class Body {
 
 	public double getEnergy() {
 		double velocityMod = this.velocity.mod();
-		return this.mass*velocityMod*velocityMod/2;
+		return this.mass * velocityMod * velocityMod / 2;
 	}
-	
+
 	private RadiusVector calculateNewRadiusVector(Vector newVelocity) {
 		Vector delta = newVelocity.add(velocity).mul(
 				SystemStateComputer.bodyIntegrationGrain / 2);
@@ -84,15 +97,15 @@ public class Body {
 		return new Body(mass, coordinates, velocity, acceleration, netForce);
 
 	}
-	
 
 	public Vector getAcceleration() {
 		return acceleration;
 	}
-	
+
 	public Vector getNetForce() {
 		return netForce;
 	}
+
 	public double getMass() {
 		return mass;
 	}
@@ -101,6 +114,7 @@ public class Body {
 	private Vector velocity = new Vector(0, 0);
 	private Vector acceleration = new Vector(0, 0);
 	private RadiusVector coordinates;
+	private RadiusVector previousCoordinates;
 	private Vector netForce = new Vector(0, 0);
 
 	private static Logger log = Logger.getAnonymousLogger();
