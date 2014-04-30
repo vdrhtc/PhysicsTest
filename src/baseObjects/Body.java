@@ -4,20 +4,20 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import calculation.Coordinates;
-import calculation.SystemStateComputer;
-import calculation.Vector;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import calculation.RadiusVector;
+import calculation.SystemStateComputer;
+import calculation.Vector;
 
 public class Body {
 
-	public Body(double mass, Coordinates coordinates) {
+	public Body(double mass, RadiusVector coordinates) {
 		this.mass = mass;
 		this.coordinates = coordinates;
 	}
 
-	public Body(double mass, Coordinates coordinates, Vector velocity,
+	public Body(double mass, RadiusVector coordinates, Vector velocity,
 			Vector acceleration, Vector netForce) {
 		this.mass = mass;
 		this.coordinates = coordinates;
@@ -28,7 +28,7 @@ public class Body {
 	public void update() {
 		Vector newAcceleration = calculateNewAcceleration();
 		Vector newVelocity = calculateVelocity(newAcceleration);
-		this.coordinates = calculateNewCoordinates(newVelocity).toCoordinates();
+		this.coordinates = calculateNewRadiusVector(newVelocity);
 		this.velocity = newVelocity;
 		this.acceleration = newAcceleration;
 		this.netForce = new Vector(0, 0);
@@ -52,10 +52,10 @@ public class Body {
 		return this.mass*velocityMod*velocityMod/2;
 	}
 	
-	private Vector calculateNewCoordinates(Vector newVelocity) {
+	private RadiusVector calculateNewRadiusVector(Vector newVelocity) {
 		Vector delta = newVelocity.add(velocity).mul(
 				SystemStateComputer.bodyIntegrationGrain / 2);
-		return coordinates.toVector().add(delta);
+		return coordinates.add(delta);
 
 	}
 
@@ -63,7 +63,7 @@ public class Body {
 		netForce = netForce.add(anotherForce);
 	}
 
-	public Coordinates getCoordinates() {
+	public RadiusVector getRadiusVector() {
 		return coordinates;
 	}
 
@@ -100,7 +100,7 @@ public class Body {
 	private double mass;
 	private Vector velocity = new Vector(0, 0);
 	private Vector acceleration = new Vector(0, 0);
-	private Coordinates coordinates;
+	private RadiusVector coordinates;
 	private Vector netForce = new Vector(0, 0);
 
 	private static Logger log = Logger.getAnonymousLogger();

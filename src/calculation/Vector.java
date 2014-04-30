@@ -3,7 +3,7 @@ package calculation;
 
 public class Vector {
 
-	public Vector(Coordinates start, Coordinates end) {
+	public Vector(RadiusVector start, RadiusVector end) {
 		this.x = end.getX() - start.getX();
 		this.y = end.getY() - start.getY();
 	}
@@ -22,9 +22,6 @@ public class Vector {
 	
 	}
 	
-	public Coordinates toCoordinates() {
-		return new Coordinates(x, y);
-	}
 	
 	public Vector div(double factor) {
 		double x = this.x/factor;
@@ -38,7 +35,7 @@ public class Vector {
 		return new Vector(x, y);
 	}
 	
-	public static double calculateDistance(Coordinates start, Coordinates end) {
+	public static double calculateDistance(RadiusVector start, RadiusVector end) {
 		return Math.sqrt((start.getX() - end.getX())
 				* (start.getX() - end.getX())
 						+ (start.getY() - end.getY())
@@ -68,9 +65,6 @@ public class Vector {
 		return y;
 	}
 
-	public String toString() {
-		return this.toCoordinates().toString();
-	}
 	
 	private double x;
 	private double y;

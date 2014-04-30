@@ -4,16 +4,16 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import calculation.Coordinates;
-import calculation.Vector;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import calculation.RadiusVector;
+import calculation.Vector;
 
 public class Spring extends Body {
 
 	public Spring(double stiffness, double undeformedLength,
 			double currentLengthDelta, double maxLengthDelta, Body startBody, Body endBody) {
-		super(0, new Coordinates(0, 0));
+		super(0, new RadiusVector(0, 0));
 		this.stiffness = stiffness;
 		this.undeformedLength = undeformedLength ;
 		this.currentLengthDelta = currentLengthDelta;
@@ -23,7 +23,7 @@ public class Spring extends Body {
 	}
 
 	public Spring(double stiffness, double undeformedLength, Body startBody, Body endBody) {
-		super(0, new Coordinates(0, 0));
+		super(0, new RadiusVector(0, 0));
 		this.stiffness = stiffness;
 		this.undeformedLength = undeformedLength;
 		this.startBody = startBody;
@@ -50,8 +50,8 @@ public class Spring extends Body {
 	}
 
 	private void updateCurrentLength() {
-		currentLength = Vector.calculateDistance(startBody.getCoordinates(),
-				endBody.getCoordinates());
+		currentLength = Vector.calculateDistance(startBody.getRadiusVector(),
+				endBody.getRadiusVector());
 	}
 
 	private double updateLengthDelta() {
@@ -70,8 +70,8 @@ public class Spring extends Body {
 
 
 	private Vector getDirectiveVector() {
-		Vector vec = new Vector(startBody.getCoordinates(),
-				endBody.getCoordinates());
+		Vector vec = new Vector(startBody.getRadiusVector(),
+				endBody.getRadiusVector());
 		return vec.div(currentLength);
 	}
 
@@ -96,10 +96,10 @@ public class Spring extends Body {
 	@Override
 	public void draw(GraphicsContext gc) {
 
-		double xs = startBody.getCoordinates().getX();
-		double ys = startBody.getCoordinates().getY();
-		double xe = endBody.getCoordinates().getX();
-		double ye = endBody.getCoordinates().getY();
+		double xs = startBody.getRadiusVector().getX();
+		double ys = startBody.getRadiusVector().getY();
+		double xe = endBody.getRadiusVector().getX();
+		double ye = endBody.getRadiusVector().getY();
 
 		if (currentLengthDelta > 0)
 			gc.setStroke(Color.GREEN);
