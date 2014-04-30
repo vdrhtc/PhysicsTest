@@ -68,6 +68,9 @@ public class Vector {
 		return y;
 	}
 
+	public String toString() {
+		return "("+this.x+", "+this.y+")";
+	}
 	
 	private double x;
 	private double y;

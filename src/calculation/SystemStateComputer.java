@@ -1,5 +1,6 @@
 package calculation;
 
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,18 +11,18 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.util.Duration;
 import baseObjects.Body;
-
+import baseObjects.Collisive;
 import communication.SystemStateConveyor;
 
 public class SystemStateComputer {
 
-	public static volatile double bodyIntegrationGrain = 5e-7;
+	public static volatile double bodyIntegrationGrain = 5e-4;
 	public static volatile Duration computationFrequencyUpdatePeriod  = Duration.millis(500);
 	
 	public SystemStateComputer(SystemState bodies) {
-		this.bodies = bodies;
+		SystemStateComputer.bodies = bodies;
 	}
-
+	
 	public void launchMonitors() {
 		Timeline tI = new Timeline();
 		tI.getKeyFrames().add(
@@ -80,7 +81,17 @@ public class SystemStateComputer {
 		for (Body b : bodies.getBodies()) {
 			b.update();
 		}
-
+	}
+	
+	public static ArrayList<Collisive> findCollisiveNeighbours(Collisive collisive) {
+		ArrayList<Collisive> a = new ArrayList<>();
+		for (Body b : bodies.getBodies()) {
+			if(b instanceof Collisive && !b.equals(collisive))
+				if(collisive.detectIntersection((Collisive) b)) {
+					a.add((Collisive) b);
+				}
+		}
+		return a;
 	}
 	
 	public static double getRealUpdateFrequency() {
@@ -95,7 +106,7 @@ public class SystemStateComputer {
 		return energyDeltaPerSecond;
 	}
 	
-	private SystemState bodies;
+	private static SystemState bodies;
 	private static Logger log = Logger.getAnonymousLogger();
 
 	private static double updtateFrequency;

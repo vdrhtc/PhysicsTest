@@ -8,7 +8,7 @@ import calculation.Vector;
 
 public class Rod extends Spring {
 
-	public static final double STIFFNESS = 1e4;
+	public static final double STIFFNESS = 1e5;
 	
 	public Rod(double length, Body startBody, Body endBody) {
 		super(STIFFNESS, length, startBody, endBody);
