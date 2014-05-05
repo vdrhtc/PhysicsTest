@@ -30,20 +30,32 @@ public class Spring extends Body {
 		this.endBody = endBody;
 	}
 
-	@Override
-	public void update() {
-		updateFields();
+	public Spring(double stiffness, Body body, Body body2) {
+		super(0, new RadiusVector(0, 0));
+		this.stiffness = stiffness;
+		this.startBody = body;
+		this.endBody = body2;
+		this.undeformedLength = new Vector(body.getRadiusVector(), body2.getRadiusVector()).mod();
 		
-		broadcastAppliedForce();
 	}
 
-	private void updateFields() {
+	@Override
+	public boolean update() {
+		updateFields();
+		if(Math.abs(currentLengthDelta)<0.5)
+			return false;
+		
+		broadcastForce();
+		return true;
+	}
+
+	protected void updateFields() {
 		updateCurrentLength();
 		updateLengthDelta();
 		updateMaxLengthDelta();
 	}
 
-	private void broadcastAppliedForce() {
+	protected void broadcastForce() {
 		Vector force = calculateAppliedForce();
 		startBody.applyForce(force);
 		endBody.applyForce(force.neg());
@@ -104,17 +116,17 @@ public class Spring extends Body {
 
 		if (currentLengthDelta > 0)
 			gc.setStroke(Color.GREEN);
-		else if (currentLengthDelta < 0)
+		if (currentLengthDelta < 0)
 			gc.setStroke(Color.RED);
-		else
+		if(Math.abs(currentLengthDelta)<0.5)
 			gc.setStroke(Color.BLACK);
 
 		gc.strokeLine(xs, ys, xe, ye);
 		log.info(maxLengthDelta + "");
 
-		gc.strokeText(String.format(Locale.US, "%.1f", maxLengthDelta) + "\n"
-				+ String.format(Locale.US, "%.0f", stiffness), (xs + xe) / 2,
-				(ys + ye) / 2);
+//		gc.strokeText(String.format(Locale.US, "%.1f", currentLengthDelta) + "\n"
+//				+ String.format(Locale.US, "%.0f", stiffness), (xs + xe) / 2,
+//				(ys + ye) / 2);
 	}
 
 	@Override

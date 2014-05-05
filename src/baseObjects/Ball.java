@@ -1,7 +1,6 @@
 package baseObjects;
 
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.logging.Logger;
 
 import javafx.scene.canvas.GraphicsContext;
@@ -24,13 +23,17 @@ public class Ball extends RoughBody implements Collisive {
 		this.radius = radius;
 	}
 
-	public void update() {
+	public boolean update() {
+
+		if(!active)
+			return false;
 		ArrayList<Collisive> toCollideWith = SystemStateComputer
 				.findCollisiveNeighbours(this);
 		for (Collisive c : toCollideWith) {
 			this.collideWith(c);
 		}
 		super.update();
+		return true;
 	}
 
 	public void collideWith(Collisive c) {
@@ -51,7 +54,7 @@ public class Ball extends RoughBody implements Collisive {
 
 		Vector force = distanceVec.div(distance)
 				.div(Math.pow( Math.abs(distance - b.getRadius()) / this.radius,
-						4) + 1e-4);
+						5) + .5e-4);
 
 		return force;
 	}

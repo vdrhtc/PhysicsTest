@@ -16,7 +16,7 @@ import javafx.util.Duration;
 
 public class ViewUpdater {
 
-	public static Duration drawPeriod = Duration.millis(10);
+	public static Duration drawPeriod = Duration.millis(20);
 	public static Duration interfaceUpdatePeriod = Duration.millis(500);
 
 	
@@ -33,8 +33,8 @@ public class ViewUpdater {
 
 					@Override
 					public void handle(ActionEvent event) {
-						elapsedTime += drawPeriod.toSeconds();
 						draw();
+						elapsedTime += drawPeriod.toSeconds();
 					}
 				}));
 
@@ -75,12 +75,16 @@ public class ViewUpdater {
 				"Updates/s: "
 						+ String.format(Locale.US, "%.2e",
 								SystemStateComputer.getRealUpdateFrequency())
+						+ ", Bodies updated: "
+						+ SystemStateComputer.getNumberOfBodiesUpdated()
 						+ ", Total energy: "
 						+ String.format(Locale.US, "%.2f", currTotal)
 						+ ", Energy delta per second: "
 						+ String.format(Locale.US, "%.2f", SystemStateComputer.getEnergyDeltaPerSecond())
-						+ ", Elapsed time: "
-						+ String.format(Locale.US, "%.2f", elapsedTime), 200,
+						+ ", Elapsed real time: "
+						+ String.format(Locale.US, "%.2f", elapsedTime)
+						+ ", Inner system time: "
+						+ String.format(Locale.US, "%.2f", SystemStateComputer.getInnerTime()), 200,
 				100);
 
 	}

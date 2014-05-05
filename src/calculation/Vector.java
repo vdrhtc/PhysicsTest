@@ -2,6 +2,8 @@ package calculation;
 
 
 public class Vector {
+	
+	public static final Vector NULLVECTOR = new Vector(0,0);
 
 	public Vector(RadiusVector start, RadiusVector end) {
 		this.x = end.getX() - start.getX();
@@ -70,6 +72,22 @@ public class Vector {
 
 	public String toString() {
 		return "("+this.x+", "+this.y+")";
+	}
+	
+	public boolean approximatelyEquals(Vector vector) {
+		if (Math.abs(vector.x-this.x)<0.1 && Math.abs(vector.y-this.y)<0.1) 
+			return true;
+		return false;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(!(o instanceof Vector)) 
+			return false;
+		Vector v = (Vector) o;
+		if(v.x==x && v.y==y)
+			return true;
+		return false;
 	}
 	
 	private double x;

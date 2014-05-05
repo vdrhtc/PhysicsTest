@@ -118,15 +118,46 @@ public class Launcher extends Application {
 //		 bodies.add(connector);
 //		 bodies.add(connector2);
 		
-		Ball killar = new Ball(10, new RadiusVector(80, 180), 0, new Vector(200, 50), new Vector(0,0), new Vector(0,0), 10);
+		Body killar = new Ball(10, new RadiusVector(100, 550), 0, new Vector(100, -100), new Vector(0,0), new Vector(0,0), 20);
+		Ball pricep = new Ball(50, new RadiusVector(1000, 200), 0, new Vector(-50, -100), new Vector(0,0), new Vector(0,0), 10);
+//		Spring connector = new Rod( killar, pricep);
 		
-		for (int i = 100; i<=1000; i+=30) {
-			for (int j = 200;j<=500; j+=30) {
-				bodies.add(new Ball(1, new RadiusVector(i, j), 0, 5));
+		for (int j = 300;j<=500; j+=30) {
+			for (int i = 100; i<=1000; i+=30) {
+				bodies.add(new Ball(1, new RadiusVector(i, j), 10, 5));
 			}
 		}
-		bodies.add(killar);
+		for (int j=0;j<4;j++){	
+			for (int i=0; i<30; i+=1){
+				bodies.add(new Rod(bodies.get(i+31*j), bodies.get(i+1+31*j)));
+			}
+//			for (int i=1; i<30; i+=2){
+//				bodies.add(new Spring(10, 40, bodies.get(i+31*j), bodies.get(i+1+31*j)));
+//			}
+		}
+		for (int i=0; i<=30;i++){
+			for (int j=0;j<3;j++){	
+				bodies.add(new Spring(100, bodies.get(i+31*j), bodies.get(i+31*(j+1))));
+			}
+		}
 		
+		for (int i=0; i<30;i+=1){
+			for (int j=0;j<3;j++){	
+				bodies.add(new Spring(100, bodies.get(i+31*j), bodies.get(i+1+31*(j+1))));
+			}
+		}
+		
+		for (int i=0; i<30;i+=1){
+			for (int j=0;j<3;j++){	
+				bodies.add(new Spring(100, bodies.get(i+31*(j+1)), bodies.get(i+1+31*(j))));
+			}
+		}
+
+		bodies.add(0, killar);
+		
+//		bodies.add(connector);
+//		bodies.add(spring);
+		bodies.add(pricep);
 		return bodies;
 	}
 
@@ -136,5 +167,6 @@ public class Launcher extends Application {
 
 	private Canvas canvas;
 	private SystemStateComputer SSC;
+
 
 }

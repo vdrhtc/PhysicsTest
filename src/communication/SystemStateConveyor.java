@@ -18,7 +18,10 @@ public class SystemStateConveyor {
 			return;
 		}
 		skippedCycles = 0;
-//		log.info("Getting next state, storing "+states.size()+" states");
+		long lastTime = SystemStateConveyor.currentTime;
+		SystemStateConveyor.currentTime = System.nanoTime();
+		
+//		log.info("Getting next state, storing "+states.size()+" states, interval: "+(SystemStateConveyor.currentTime*1e-6-lastTime*1e-6));
 		try {
 			states.put(s.clone());
 		} catch (InterruptedException e) {
@@ -32,12 +35,13 @@ public class SystemStateConveyor {
 	}
 
 	private static int cyclesToSkip;
+	private static long currentTime = 0;
 	private static int skippedCycles;
 	private static ArrayBlockingQueue<SystemState> states = new ArrayBlockingQueue<>(
-			10);
+			1);
 	private static Logger log = Logger.getAnonymousLogger();
 
 	static {
-		log.setLevel(Level.OFF);
+		log.setLevel(Level.ALL);
 	}
 }

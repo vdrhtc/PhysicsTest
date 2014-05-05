@@ -1,6 +1,5 @@
 package baseObjects;
 
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,7 +24,17 @@ public class Body {
 		this.acceleration = acceleration;
 	}
 
-	public void update() {
+	public boolean update() {
+		if(!this.active)
+			return false;
+
+		if(this.velocity.approximatelyEquals(Vector.NULLVECTOR) && this.acceleration.approximatelyEquals(Vector.NULLVECTOR)) {
+			this.active=false;
+			this.velocity = Vector.NULLVECTOR;
+			this.acceleration = Vector.NULLVECTOR;
+		}
+		
+//		log.info("Hell i am updating "+this.coordinates+" "+this.velocity);
 		Vector newAcceleration = calculateNewAcceleration();
 		Vector newVelocity = calculateVelocity(newAcceleration);
 		RadiusVector previousCoordinates = this.coordinates;
@@ -36,7 +45,7 @@ public class Body {
 		this.previousCoordinates = previousCoordinates;
 		this.acceleration = newAcceleration;
 		this.netForce = new Vector(0, 0);
-
+		return true;
 	}
 
 	private RadiusVector calculateNewRadiusVectorVerlet() {
@@ -73,6 +82,10 @@ public class Body {
 	}
 
 	public void applyForce(Vector anotherForce) {
+		if(this.active==false) {
+//			log.info("I should activate!");
+		}
+		this.active=true;
 		netForce = netForce.add(anotherForce);
 	}
 
@@ -88,9 +101,9 @@ public class Body {
 		gc.setStroke(Color.BLACK);
 
 		gc.fillOval(coordinates.getX() - 5, coordinates.getY() - 5, 10, 10);
-		gc.strokeText(
-				String.format(Locale.US, "%.3f", velocity.mod()) + "px/s",
-				coordinates.getX() - 5, coordinates.getY() - 5);
+//		gc.strokeText(
+//				String.format(Locale.US, "%.3f", velocity.mod()) + "px/s",
+//				coordinates.getX() - 5, coordinates.getY() - 5);
 	}
 
 	public Body clone() {
@@ -111,15 +124,23 @@ public class Body {
 	}
 
 	private double mass;
-	private Vector velocity = new Vector(0, 0);
-	private Vector acceleration = new Vector(0, 0);
+	private Vector velocity = Vector.NULLVECTOR;
+	private Vector acceleration = Vector.NULLVECTOR;
 	private RadiusVector coordinates;
 	private RadiusVector previousCoordinates;
-	private Vector netForce = new Vector(0, 0);
+	private Vector netForce = Vector.NULLVECTOR;
+	protected boolean active = true;
 
 	private static Logger log = Logger.getAnonymousLogger();
 	static {
-		log.setLevel(Level.OFF);
+		log.setLevel(Level.ALL);
+	}
+	public void move(Vector delta) {
+		this.coordinates = this.coordinates.add(delta);
+	}
+
+	public void accelerate(Vector delta) {
+		this.acceleration = this.acceleration.add(delta);
 	}
 
 }

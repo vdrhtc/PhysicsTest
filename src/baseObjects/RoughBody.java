@@ -10,7 +10,7 @@ public class RoughBody extends Body {
 		this.frictionFactor = frictionFactor;
 	}
 
-	protected RoughBody(double mass, RadiusVector coordinates,
+	public RoughBody(double mass, RadiusVector coordinates,
 			double frictionFactor, Vector velocity, Vector acceleration,
 			Vector netForce) {
 		super(mass, coordinates, velocity, acceleration, netForce);
@@ -18,11 +18,21 @@ public class RoughBody extends Body {
 	}
 
 	@Override
-	public void update() {
-		Vector friction = getVelocity().norm().mul(-frictionFactor);
+	public boolean update() {
+		if(!active)
+			return false;
 		
-		this.applyForce(friction);
+		applyNonZeroFriction();
+		
 		super.update();
+		return true;
+	}
+
+	private void applyNonZeroFriction() {
+		if(getVelocity().approximatelyEquals(Vector.NULLVECTOR))
+			return;
+		Vector friction = getVelocity().norm().mul(-frictionFactor);
+		this.applyForce(friction);
 	}
 	
 	public double getFrictionFactor() {

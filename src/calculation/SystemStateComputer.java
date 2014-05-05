@@ -1,6 +1,7 @@
 package calculation;
 
 import java.util.ArrayList;
+import java.util.concurrent.CyclicBarrier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,109 +17,170 @@ import communication.SystemStateConveyor;
 
 public class SystemStateComputer {
 
-	public static volatile double bodyIntegrationGrain = 5e-4;
-	public static volatile Duration computationFrequencyUpdatePeriod  = Duration.millis(500);
-	
+	public static volatile double bodyIntegrationGrain = 0.5e-3;
+	public static volatile Duration monitorsUpdatePeriod = Duration
+			.millis(300);
+
 	public SystemStateComputer(SystemState bodies) {
 		SystemStateComputer.bodies = bodies;
 	}
-	
+
 	public void launchMonitors() {
 		Timeline tI = new Timeline();
 		tI.getKeyFrames().add(
-				new KeyFrame(computationFrequencyUpdatePeriod,
+				new KeyFrame(monitorsUpdatePeriod,
 						new EventHandler<ActionEvent>() {
 
 							@Override
 							public void handle(ActionEvent event) {
 								refreshCalculationFrequency();
 								refreshEnergyErrorPerSecond();
+								refreshUpdatedBodiesNumber();
+								refreshInnerTime();
 							}
 
-							
 						}));
 
 		tI.setCycleCount(Timeline.INDEFINITE);
 		tI.play();
-		
+
 	}
 	
+	private void refreshInnerTime() {
+		innerTime += diffUpdatesNum*SystemStateComputer.bodyIntegrationGrain;
+	}
+
+	private void refreshUpdatedBodiesNumber() {
+		lastNumberOfBodiesUpdated = bodiesReallyUpdated;
+	}
+
 	private void refreshEnergyErrorPerSecond() {
 		double newEnergy = bodies.calculateEnergy();
-		energyDeltaPerSecond = (newEnergy-lastEnergy);
+		energyDeltaPerSecond = (newEnergy - lastEnergy);
 		lastEnergy = newEnergy;
 	}
-	
+
 	private void refreshCalculationFrequency() {
 		diffUpdatesNum = totalUpdatesNum;
 		totalUpdatesNum = 0;
-		updtateFrequency = (diffUpdatesNum/computationFrequencyUpdatePeriod.toSeconds());
+		updtateFrequency = (diffUpdatesNum / monitorsUpdatePeriod
+				.toSeconds());
 	}
-
 
 	public void launchBodiesUpdate() {
-		Task<Object> taskGenerate = new Task<Object>() {
+
+		int desiredPartsNumber = 8;
+
+		final ArrayList<ArrayList<Body>> parts = bodies.split(desiredPartsNumber);
+		System.out.println(parts.size());
+
+		endBarrier = new CyclicBarrier(parts.size(), new Runnable() {
 
 			@Override
-			protected Object call() throws Exception {
-				while (true) {
-					updateBodies();
-					totalUpdatesNum++;
-					SystemStateConveyor.recieveNextSystemState(bodies);
-				}
+			public void run() {
+				startBarrier.reset();
+				SystemStateConveyor.recieveNextSystemState(bodies);
+				totalUpdatesNum++;
+				log.info("Step made");
 			}
 
-		};
+		});
 
-		Thread tG = new Thread(taskGenerate);
-		tG.setDaemon(true);
-		tG.start();
-	}
-	
+		startBarrier = new CyclicBarrier(parts.size(), new Runnable() {
 
-	private void updateBodies() {
+			@Override
+			public void run() {
+				endBarrier.reset();
+			}
 
-		for (Body b : bodies.getBodies()) {
-			b.update();
+		});
+
+		for (final ArrayList<Body> part : parts) {
+
+			Task<Object> taskGenerate = new Task<Object>() {
+
+				@Override
+				protected Object call() throws Exception {
+					while (true) {
+						startBarrier.await();
+						updateBodies(part);
+//						log.info("Processing "
+//								+ Thread.currentThread().getName());
+						endBarrier.await();
+//						log.info("Thread " + Thread.currentThread().getName()
+//								+ " crossed the barrier");
+					}
+//						return null;
+				}
+
+			};
+
+			Thread tG = new Thread(taskGenerate);
+			tG.setDaemon(true);
+			tG.start();
 		}
 	}
-	
-	public static ArrayList<Collisive> findCollisiveNeighbours(Collisive collisive) {
+
+	private void updateBodies(ArrayList<Body> bodiesToUpdate) {
+
+		bodiesReallyUpdated = 0;
+		for (Body b : bodiesToUpdate) {
+			if (b.update()) {
+				bodiesReallyUpdated++;
+			}
+		}
+	}
+
+	public static ArrayList<Collisive> findCollisiveNeighbours(
+			Collisive collisive) {
 		ArrayList<Collisive> a = new ArrayList<>();
 		for (Body b : bodies.getBodies()) {
-			if(b instanceof Collisive && !b.equals(collisive))
-				if(collisive.detectIntersection((Collisive) b)) {
+			if (b instanceof Collisive && !b.equals(collisive))
+				if (collisive.detectIntersection((Collisive) b)) {
 					a.add((Collisive) b);
 				}
 		}
 		return a;
 	}
-	
+
 	public static double getRealUpdateFrequency() {
 		return updtateFrequency;
 	}
-		
+
+	public static double getInnerTime() {
+		return innerTime;
+	}
+	
 	public static double getRealUpdatePeriod() {
-		return 1/updtateFrequency;
+		return 1 / updtateFrequency;
 	}
 
 	public static double getEnergyDeltaPerSecond() {
 		return energyDeltaPerSecond;
 	}
-	
+
+	public static int getNumberOfBodiesUpdated() {
+		return lastNumberOfBodiesUpdated;
+	}
+
 	private static SystemState bodies;
 	private static Logger log = Logger.getAnonymousLogger();
 
 	private static double updtateFrequency;
 	private volatile long totalUpdatesNum;
 	private static volatile long diffUpdatesNum;
-	
+	private static volatile int bodiesReallyUpdated = 0;
+	private static volatile double innerTime=0;
+
 	private double lastEnergy;
 	private static volatile double energyDeltaPerSecond;
-	
-	
+	private static volatile int lastNumberOfBodiesUpdated;
+
+	private CyclicBarrier endBarrier;
+	private CyclicBarrier startBarrier;
+
 	static {
-		log.setLevel(Level.ALL);
+		log.setLevel(Level.OFF);
 	}
 
 }
