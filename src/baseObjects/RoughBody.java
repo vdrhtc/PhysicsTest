@@ -17,14 +17,22 @@ public class RoughBody extends Body {
 		this.frictionFactor = frictionFactor;
 	}
 
+	
 	@Override
-	public boolean update() {
+	public void updateForces()  {
+		if(!active)
+			return;
+
+		applyNonZeroFriction();
+		super.updateForces();
+	}
+	
+	@Override
+	public boolean updatePosition() {
 		if(!active)
 			return false;
 		
-		applyNonZeroFriction();
-		
-		super.update();
+		super.updatePosition();
 		return true;
 	}
 

@@ -3,6 +3,7 @@ package view;
 import java.util.Locale;
 
 import communication.SystemStateConveyor;
+import calculation.RadiusVector;
 import calculation.SystemState;
 import calculation.SystemStateComputer;
 import baseObjects.Body;
@@ -49,6 +50,14 @@ public class ViewUpdater {
 					.getHeight());
 			drawInterface(s);
 			drawBodies(s);
+			drawBosons(s);
+			
+		}
+	}
+	
+	private static void drawBosons(SystemState s) {
+		for (RadiusVector r : s.getEtherBosons()) {
+			gc.fillRect(r.getX()-0.5, r.getY()-0.5, 1, 1);
 		}
 	}
 	

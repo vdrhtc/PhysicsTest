@@ -5,6 +5,8 @@ import java.util.logging.Logger;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import calculation.DiscreteRect;
+import calculation.Ether;
 import calculation.RadiusVector;
 import calculation.SystemStateComputer;
 import calculation.Vector;
@@ -23,16 +25,30 @@ public class Ball extends RoughBody implements Collisive {
 		this.radius = radius;
 	}
 
-	public boolean update() {
+	@Override
+	public void updateEther() {
+		SystemStateComputer.getEther().modifyInteractionFieldFor(this);
 
-		if(!active)
-			return false;
-		ArrayList<Collisive> toCollideWith = SystemStateComputer
-				.findCollisiveNeighbours(this);
+	}
+
+	@Override
+	public void updateForces() {
+
+		ArrayList<Collisive> toCollideWith = SystemStateComputer.getEther()
+				.getBosonOwnersNear(this);
+
 		for (Collisive c : toCollideWith) {
-			this.collideWith(c);
+			if (!c.equals(this))
+				this.collideWith(c);
 		}
-		super.update();
+		super.updateForces();
+	}
+
+	@Override
+	public boolean updatePosition() {
+		if (!active)
+			return false;
+		super.updatePosition();
 		return true;
 	}
 
@@ -53,7 +69,7 @@ public class Ball extends RoughBody implements Collisive {
 		double distance = distanceVec.mod();
 
 		Vector force = distanceVec.div(distance)
-				.div(Math.pow( Math.abs(distance - b.getRadius()) / this.radius,
+				.div(Math.pow(Math.abs(distance - b.getRadius()) / this.radius,
 						5) + .5e-4);
 
 		return force;
@@ -64,7 +80,7 @@ public class Ball extends RoughBody implements Collisive {
 	}
 
 	@Override
-	public boolean detectIntersection(Collisive c) {
+	public boolean detectCollision(Collisive c) {
 		if (c.getCollisiveType() == CollisiveType.BALL) {
 			Ball b = (Ball) c;
 			if (Math.abs(b.getRadiusVector().getX()
@@ -82,11 +98,13 @@ public class Ball extends RoughBody implements Collisive {
 	public void draw(GraphicsContext gc) {
 		gc.setStroke(Color.BLACK);
 
-		gc.fillOval(getRadiusVector().getX() - radius, getRadiusVector().getY()
-				- radius, 2 * radius, 2 * radius);
-//		gc.strokeText(String.format(Locale.US, "%.3f", getVelocity().mod())
-//				+ "px/s", getRadiusVector().getX() - radius, getRadiusVector()
-//				.getY() - radius);
+		gc.strokeOval(getRadiusVector().getX() - radius, getRadiusVector()
+				.getY() - radius, 2 * radius, 2 * radius);
+		// gc.strokeText(String.format(Locale.US, "%.3f", getVelocity().mod())
+		// + "px/s", getRadiusVector().getX() - radius, getRadiusVector()
+		// .getY() - radius);
+		gc.fillOval(getRadiusVector().getX() - 0.5,
+				getRadiusVector().getY() - 0.5, 1, 1);
 	}
 
 	@Override
@@ -100,7 +118,33 @@ public class Ball extends RoughBody implements Collisive {
 				getVelocity(), getAcceleration(), getNetForce(), this.radius);
 	}
 
+	public DiscreteRect getFieldArea() {
+		return fieldArea;
+	}
+
+	public void modifyFieldArea(DiscreteRect newFieldArea) {
+	
+		
+		if (this.fieldArea != null) {
+			Ether e = SystemStateComputer.getEther();
+			DiscreteRect r = this.fieldArea;
+
+			for (int x = r.getxInteval().getValue0(); x <= r.getxInteval()
+					.getValue1(); x += e.GRID_STEP) {
+				for (int y = r.getyInterval().getValue0(); y <= r
+						.getyInterval().getValue1(); y += e.GRID_STEP) {
+					e.removeCollisiveBosonFromPoint(new RadiusVector(x, y),
+							this);
+
+				}
+			}
+			
+		}
+		this.fieldArea = newFieldArea;
+	}
+
 	private double radius;
+	private DiscreteRect fieldArea;
 
 	private static Logger log = Logger.getAnonymousLogger();
 

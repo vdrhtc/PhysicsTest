@@ -22,7 +22,8 @@ public class Rod extends Spring {
 		super(-1, length, currentLengthDelta, maxLengthDelta, startBody, endBody);
 	}
 	
-	public boolean update() {
+	@Override
+	public boolean updatePosition() {
 		updateFields();
 		if(Math.abs(getCurrentLengthDelta())<0.01)
 			return false;

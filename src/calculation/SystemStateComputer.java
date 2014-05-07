@@ -1,6 +1,7 @@
 package calculation;
 
 import java.util.ArrayList;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,12 +18,17 @@ import communication.SystemStateConveyor;
 
 public class SystemStateComputer {
 
-	public static volatile double bodyIntegrationGrain = 0.5e-3;
+	public static volatile double bodyIntegrationGrain = 5e-4;
 	public static volatile Duration monitorsUpdatePeriod = Duration
 			.millis(300);
 
 	public SystemStateComputer(SystemState bodies) {
 		SystemStateComputer.bodies = bodies;
+		ether = new Ether();
+	}
+	
+	public static SystemState getSystemState() {
+		return bodies;
 	}
 
 	public void launchMonitors() {
@@ -69,28 +75,33 @@ public class SystemStateComputer {
 
 	public void launchBodiesUpdate() {
 
-		int desiredPartsNumber = 8;
+		int desiredPartsNumber = 1;
 
 		final ArrayList<ArrayList<Body>> parts = bodies.split(desiredPartsNumber);
 		System.out.println(parts.size());
 
-		endBarrier = new CyclicBarrier(parts.size(), new Runnable() {
+		positionsUpdateBarrier = new CyclicBarrier(parts.size(), new Runnable() {
 
 			@Override
 			public void run() {
 				startBarrier.reset();
 				SystemStateConveyor.recieveNextSystemState(bodies);
+//				ether.clearGrid();
 				totalUpdatesNum++;
-				log.info("Step made");
 			}
 
 		});
 
+		forcesUpdateBarrier = new CyclicBarrier(parts.size());
+
+		etherUpdateBarrier = new CyclicBarrier(parts.size());
+		
 		startBarrier = new CyclicBarrier(parts.size(), new Runnable() {
 
 			@Override
 			public void run() {
-				endBarrier.reset();
+				forcesUpdateBarrier.reset();
+				positionsUpdateBarrier.reset();
 			}
 
 		});
@@ -100,19 +111,27 @@ public class SystemStateComputer {
 			Task<Object> taskGenerate = new Task<Object>() {
 
 				@Override
-				protected Object call() throws Exception {
+				protected Object call() throws InterruptedException, BrokenBarrierException {
 					while (true) {
+						try {
 						startBarrier.await();
-						updateBodies(part);
-//						log.info("Processing "
-//								+ Thread.currentThread().getName());
-						endBarrier.await();
-//						log.info("Thread " + Thread.currentThread().getName()
-//								+ " crossed the barrier");
+						
+						updateEther(part);
+						
+						etherUpdateBarrier.await();
+						
+						updateForces(part);
+						
+						forcesUpdateBarrier.await();
+						
+						updatePositions(part);
+						
+						positionsUpdateBarrier.await();
+						} catch(NullPointerException e) {
+							e.printStackTrace();
+						}
 					}
-//						return null;
 				}
-
 			};
 
 			Thread tG = new Thread(taskGenerate);
@@ -120,23 +139,35 @@ public class SystemStateComputer {
 			tG.start();
 		}
 	}
+	
+	private void updateEther(ArrayList<Body> bodiesToUpdate) {
+		for (Body b : bodiesToUpdate) {
+			b.updateEther();
+		}
+	}
 
-	private void updateBodies(ArrayList<Body> bodiesToUpdate) {
+	private void updateForces(ArrayList<Body> bodiesToUpdate) {
+		for (Body b : bodiesToUpdate) {
+			b.updateForces();
+		}
+	}
+
+	private void updatePositions(ArrayList<Body> bodiesToUpdate) {
 
 		bodiesReallyUpdated = 0;
 		for (Body b : bodiesToUpdate) {
-			if (b.update()) {
+			if (b.updatePosition()) {
 				bodiesReallyUpdated++;
 			}
 		}
 	}
-
+	
 	public static ArrayList<Collisive> findCollisiveNeighbours(
 			Collisive collisive) {
 		ArrayList<Collisive> a = new ArrayList<>();
 		for (Body b : bodies.getBodies()) {
 			if (b instanceof Collisive && !b.equals(collisive))
-				if (collisive.detectIntersection((Collisive) b)) {
+				if (collisive.detectCollision((Collisive) b)) {
 					a.add((Collisive) b);
 				}
 		}
@@ -162,6 +193,14 @@ public class SystemStateComputer {
 	public static int getNumberOfBodiesUpdated() {
 		return lastNumberOfBodiesUpdated;
 	}
+	
+	public static int getNumberOfBodies() {
+		return bodies.getBodies().size();
+	}
+	
+	public static Ether getEther() {
+		return ether;
+	}
 
 	private static SystemState bodies;
 	private static Logger log = Logger.getAnonymousLogger();
@@ -175,9 +214,12 @@ public class SystemStateComputer {
 	private double lastEnergy;
 	private static volatile double energyDeltaPerSecond;
 	private static volatile int lastNumberOfBodiesUpdated;
+	private static volatile Ether ether;
 
-	private CyclicBarrier endBarrier;
+	private CyclicBarrier forcesUpdateBarrier;
 	private CyclicBarrier startBarrier;
+	private CyclicBarrier positionsUpdateBarrier;
+	private CyclicBarrier etherUpdateBarrier;
 
 	static {
 		log.setLevel(Level.OFF);

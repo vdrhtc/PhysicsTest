@@ -23,8 +23,16 @@ public class Body {
 		this.velocity = velocity;
 		this.acceleration = acceleration;
 	}
+	
+	public void updateForces()  {
+		return;
+	}
+	
+	public void updateEther() {
+		return;
+	}
 
-	public boolean update() {
+	public boolean updatePosition() {
 		if(!this.active)
 			return false;
 
@@ -34,7 +42,6 @@ public class Body {
 			this.acceleration = Vector.NULLVECTOR;
 		}
 		
-//		log.info("Hell i am updating "+this.coordinates+" "+this.velocity);
 		Vector newAcceleration = calculateNewAcceleration();
 		Vector newVelocity = calculateVelocity(newAcceleration);
 		RadiusVector previousCoordinates = this.coordinates;
@@ -48,6 +55,7 @@ public class Body {
 		return true;
 	}
 
+	
 	private RadiusVector calculateNewRadiusVectorVerlet() {
 		return this.coordinates
 				.mul(2)
@@ -123,6 +131,10 @@ public class Body {
 		return mass;
 	}
 
+	
+	public RadiusVector getPreviousCoordinates() {
+		return previousCoordinates;
+	}
 	private double mass;
 	private Vector velocity = Vector.NULLVECTOR;
 	private Vector acceleration = Vector.NULLVECTOR;

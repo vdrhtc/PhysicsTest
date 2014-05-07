@@ -40,12 +40,19 @@ public class Spring extends Body {
 	}
 
 	@Override
-	public boolean update() {
+	public void updateForces() {
 		updateFields();
 		if(Math.abs(currentLengthDelta)<0.5)
-			return false;
+			return;
 		
 		broadcastForce();
+		return;
+	}
+	
+	@Override
+	public boolean updatePosition() {
+		if(Math.abs(currentLengthDelta)<0.5)
+			return false;
 		return true;
 	}
 

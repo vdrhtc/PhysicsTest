@@ -10,10 +10,18 @@ public class SystemState {
 		this.bodies = bs;
 	}
 	
+	public SystemState(ArrayList<Body> copyBodies, ArrayList<RadiusVector> copyBosons) {
+		this.bodies=copyBodies;
+		this.etherBosons= copyBosons;
+	}
+
 	public ArrayList<Body> getBodies() {
 		return bodies;
 	}
 	
+	public ArrayList<RadiusVector> getEtherBosons() {
+		return etherBosons;
+	}
 
 	public double calculateEnergy() {
 		double currTotal=0; 
@@ -29,7 +37,8 @@ public class SystemState {
 		for (Body b : bodies) {
 			copyBodies.add(b.clone());
 		}
-		return new SystemState(copyBodies);
+		ArrayList<RadiusVector> copyBosons = SystemStateComputer.getEther().getBosons();
+		return new SystemState(copyBodies, copyBosons);
 	}
 	public ArrayList<ArrayList<Body>> split(int partsNumber) {
 		
@@ -49,6 +58,7 @@ public class SystemState {
 	}
 	
 	private ArrayList<Body> bodies;
+	private ArrayList<RadiusVector> etherBosons;
 
 	
 }
